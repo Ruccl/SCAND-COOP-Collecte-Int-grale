@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SCAND COOP • Collecte Intégrale 2026</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  body { font-family: 'Inter', sans-serif; background: linear-gradient(180deg, #0f172a 0%, #020617 100%); color: white; min-height: 100vh; }
+  .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 32px; }
+  .input-field { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); transition: all 0.3s; color: white; }
+  .input-field:focus { border-color: #10b981; background: rgba(255,255,255,0.12); outline: none; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+  label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 0.5rem; display: block; }
+</style>
+</head>
+<body class="pb-12 px-4">
+
+<div class="max-w-2xl mx-auto pt-8">
+  <header class="text-center mb-10">
+    <h1 class="text-3xl font-black tracking-tighter italic">SCAND <span class="text-emerald-500">COOP</span></h1>
+    <p class="text-[10px] font-bold tracking-[0.3em] text-emerald-500/80">FICHE TECHNIQUE D'AUDIT 2026</p>
+  </header>
+
+  <form id="mainForm" class="space-y-6">
+    <input type="hidden" name="latitude" id="lat">
+    <input type="hidden" name="longitude" id="lng">
+
+    <div class="glass p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500"><i class="fa-solid fa-user-gear"></i></div>
+        <h2 class="text-lg font-black uppercase italic">Identification</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label>Nom de l'Inspecteur (IP) *</label><input type="text" name="ip" required class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Nom du Producteur *</label><input type="text" name="prod" required class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Code Unique Producteur *</label><input type="text" name="code" required class="input-field w-full px-5 py-4 rounded-2xl font-mono text-emerald-400"></div>
+        <div><label>Surface Cacao (ha) *</label><input type="number" step="0.01" name="surf_cacao" required class="input-field w-full px-5 py-4 rounded-2xl"></div>
+      </div>
+    </div>
+
+    <div class="glass p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500"><i class="fa-solid fa-tree"></i></div>
+        <h2 class="text-lg font-black uppercase italic">Agroforesterie</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label>Taille exploitation (ha)</label><input type="number" step="0.01" name="taille_expl" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Surface production (ha)</label><input type="number" step="0.01" name="surf_prod" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Vol. Estimé Précédent (kg)</label><input type="number" name="vol_prec" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Ombrage / hectare</label><input type="number" name="ombr_ha" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Ombrage Total</label><input type="number" name="ombr_tot" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Espèces Indigènes</label><input type="number" name="esp_indig" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Couverture Végétale (%)</label><input type="number" name="couv_veg" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+      </div>
+    </div>
+
+    <div class="glass p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500"><i class="fa-solid fa-flask-vial"></i></div>
+        <h2 class="text-lg font-black uppercase italic">Intrants & Énergie</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label>Eau Irrigation (L)</label><input type="number" name="eau_irr" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Eau Transfo. (L)</label><input type="number" name="eau_trans" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Carburant Fossile (L)</label><input type="number" name="carb" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Électricité (kWh)</label><input type="number" name="elec" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Insecticide</label><input type="number" name="pest_ins" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Herbicide</label><input type="number" name="pest_her" class="input-field w-full px-5 py-4 rounded-2xl"></div>
+        <div><label>Ingrédients Actifs</label><input type="text" name="ing_act" class="input-field w-full px-5 py-4 rounded-2xl" placeholder="Noms"></div>
+      </div>
+    </div>
+
+    <div id="social-container" class="space-y-6"></div>
+
+    <div class="glass p-8">
+      <label>Signature du producteur</label>
+      <div class="bg-white rounded-2xl overflow-hidden mb-4">
+        <canvas id="signature-pad" class="w-full h-40 touch-none"></canvas>
+      </div>
+      <button type="button" onclick="signaturePad.clear()" class="text-[10px] font-black uppercase text-rose-500 underline">Effacer la signature</button>
+    </div>
+
+    <div class="space-y-3">
+      <button type="submit" id="btnEnvoyer" class="w-full bg-emerald-500 hover:bg-emerald-400 py-6 rounded-[2rem] font-black text-xs uppercase tracking-widest transition-all shadow-xl shadow-emerald-500/20">
+        Synchroniser les données
+      </button>
+
+      <div class="grid grid-cols-2 gap-3">
+        <button type="button" onclick="saveDraft()" class="bg-white/5 border border-white/10 hover:bg-white/10 py-4 rounded-2xl font-black text-[9px] uppercase tracking-widest transition-all">
+          <i class="fa-solid fa-bookmark mr-2 text-emerald-500"></i> Sauvegarder Brouillon
+        </button>
+        <button type="button" onclick="restoreDraft()" class="bg-white/5 border border-white/10 hover:bg-white/10 py-4 rounded-2xl font-black text-[9px] uppercase tracking-widest transition-all">
+          <i class="fa-solid fa-clock-rotate-left mr-2 text-amber-500"></i> Restaurer Brouillon
+        </button>
+      </div>
+    </div>
+    
+    <p id="status" class="text-center text-[10px] font-black uppercase mt-4"></p>
+  </form>
+</div>
+
+<script>
+// --- LOGIQUE FIREBASE & SIGNATURE (Identique au précédent) ---
+const firebaseConfig = {
+  apiKey: "AIzaSyBHAcy17PW7XvUc17rx8GP-7zbxURhxm6M",
+  authDomain: "scand-coop-ca-f6e0a.firebaseapp.com",
+  databaseURL: "https://scand-coop-ca-f6e0a-default-rtdb.firebaseio.com/",
+  projectId: "scand-coop-ca-f6e0a"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const canvas = document.getElementById('signature-pad');
+const signaturePad = new SignaturePad(canvas);
+function resizeCanvas() {
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext("2d").scale(ratio, ratio);
+}
+window.onresize = resizeCanvas;
+resizeCanvas();
+
+const cats = [
+  {id:"enf", n:"Travail des Enfants"},
+  {id:"f", n:"Travail Forcé"},
+  {id:"d", n:"Discrimination"},
+  {id:"v", n:"Violence & Harcèlement"}
+];
+
+function renderSocial() {
+  const container = document.getElementById('social-container');
+  cats.forEach(c => {
+    const div = document.createElement('div');
+    div.className = "glass p-8";
+    div.innerHTML = `
+      <h2 class="text-xs font-black uppercase italic text-emerald-500 mb-6">${c.n}</h2>
+      <div class="grid grid-cols-3 gap-3 text-center">
+        <div class="space-y-2"><p class="text-[8px] font-black opacity-40">SIGNALÉS</p>
+          <input type="number" name="${c.id}_s_h" placeholder="H" class="input-field w-full p-3 rounded-xl text-center">
+          <input type="number" name="${c.id}_s_f" placeholder="F" class="input-field w-full p-3 rounded-xl text-center">
+        </div>
+        <div class="space-y-2"><p class="text-[8px] font-black opacity-40">CONFIRMÉS</p>
+          <input type="number" name="${c.id}_c_h" placeholder="H" class="input-field w-full p-3 rounded-xl text-center text-emerald-400">
+          <input type="number" name="${c.id}_c_f" placeholder="F" class="input-field w-full p-3 rounded-xl text-center text-emerald-400">
+        </div>
+        <div class="space-y-2"><p class="text-[8px] font-black opacity-40">RÉSOLUS</p>
+          <input type="number" name="${c.id}_r_h" placeholder="H" class="input-field w-full p-3 rounded-xl text-center">
+          <input type="number" name="${c.id}_r_f" placeholder="F" class="input-field w-full p-3 rounded-xl text-center">
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+renderSocial();
+
+// --- NOUVELLE LOGIQUE BROUILLON MANUELLE ---
+const form = document.getElementById('mainForm');
+
+function saveDraft() {
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    localStorage.setItem('scand_manual_draft', JSON.stringify(data));
+    const status = document.getElementById("status");
+    status.innerHTML = `<span class="text-emerald-400">💾 BROUILLON SAUVEGARDÉ EN LOCAL</span>`;
+    setTimeout(() => status.innerHTML = "", 3000);
+}
+
+function restoreDraft() {
+    const draft = localStorage.getItem('scand_manual_draft');
+    if (draft) {
+        const data = JSON.parse(draft);
+        Object.keys(data).forEach(key => {
+            const field = form.querySelector(`[name="${key}"]`);
+            if (field) field.value = data[key];
+        });
+        const status = document.getElementById("status");
+        status.innerHTML = `<span class="text-amber-400">🔄 DONNÉES RESTAURÉES</span>`;
+        setTimeout(() => status.innerHTML = "", 3000);
+    } else {
+        alert("Aucun brouillon trouvé.");
+    }
+}
+
+// Géoloc
+navigator.geolocation.getCurrentPosition(p => {
+  document.getElementById('lat').value = p.coords.latitude;
+  document.getElementById('lng').value = p.coords.longitude;
+}, null, {enableHighAccuracy: true});
+
+// Envoi final
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (signaturePad.isEmpty()) return alert("La signature du producteur est obligatoire.");
+
+  const btn = document.getElementById("btnEnvoyer");
+  const status = document.getElementById("status");
+  btn.disabled = true;
+  btn.innerHTML = "SÉCURISATION DU FLUX...";
+
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData);
+  
+  Object.keys(data).forEach(k => {
+    if (data[k] !== "" && !isNaN(data[k]) && !["ip", "prod", "code", "ing_act"].includes(k)) {
+      data[k] = Number(data[k]);
+    }
+  });
+
+  data.signature = signaturePad.toDataURL();
+  data.timestamp = firebase.database.ServerValue.TIMESTAMP;
+
+  try {
+    await db.ref("collectes_finales").push(data);
+    localStorage.removeItem('scand_manual_draft'); // Nettoie le brouillon après envoi réussi
+    status.innerHTML = `<span class="text-emerald-400">CERTIFICATION RÉUSSIE ✅</span>`;
+    form.reset();
+    signaturePad.clear();
+    window.scrollTo(0, 0);
+  } catch (err) {
+    status.innerHTML = `<span class="text-rose-500">ERREUR DE CONNEXION ❌</span>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "Synchroniser les données";
+  }
+});
+</script>
+</body>
+</html>
